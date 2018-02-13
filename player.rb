@@ -1,18 +1,46 @@
 class Player
-  attr_reader :name, :bank, :cards
-  def initialize(name)
-    @name = name
+  attr_reader :name
+  attr_accessor :bank, :cards
+  def initialize(username)
+    @name = username
     @bank = 100
     @cards = []
   end
 
-  #Добавляет к себе карту с колоды и удаляет эту карту с колоды
+  def make_bet(bank)
+    @bank -= 10
+    bank.debet(10)
+  end
 
-  #Добавить карту (только если карт 2)
+  def add_money(money)
+    @bank += money
+  end
 
-  #Проспустить ход
+  def take_card(cards)
+    card = cards.sample
+    @cards << card
+    cards.delete(card)
+  end
 
-  #Открыть карты
+  def score
+    @score = 0
+    @cards.each do |card|
+      @score += card.value.first
+    end
+    first = @cards.first
+    if first.value.size == 2 && @score > 21
+      @score -= first.value.first
+      @score += first.value.last
+    end
+    @score
+  end
 
-  #Ставка банк
+  # Исправить
+  def all_cards
+    all_cards = ''
+    @cards.each do |card|
+      all_cards = "#{all_cards} #{card.face}"
+    end
+    all_cards
+  end
 end
