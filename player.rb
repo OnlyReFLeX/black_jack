@@ -25,12 +25,11 @@ class Player
   def score
     @score = 0
     @cards.each do |card|
-      @score += card.value.first
-    end
-    first = @cards.first
-    if first.value.size == 2 && @score > 21
-      @score -= first.value.first
-      @score += first.value.last
+      @score += if @score + card.value.max > 21
+                  ard.value.min
+                else
+                  card.value.max
+                end
     end
     @score
   end
