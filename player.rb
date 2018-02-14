@@ -1,8 +1,8 @@
 class Player
   attr_reader :name
   attr_accessor :bank, :cards
-  def initialize(username)
-    @name = username
+  def initialize(name)
+    @name = name
     @bank = 100
     @cards = []
   end
@@ -16,10 +16,10 @@ class Player
     @bank += money
   end
 
-  def take_card(cards)
-    card = cards.sample
+  def take_card(deck)
+    card = deck.cards.sample
     @cards << card
-    cards.delete(card)
+    deck.cards.delete(card)
   end
 
   def score
@@ -35,12 +35,9 @@ class Player
     @score
   end
 
-  # Исправить
   def all_cards
     all_cards = ''
-    @cards.each do |card|
-      all_cards = "#{all_cards} #{card.face}"
-    end
+    @cards.each { |card| all_cards = "#{all_cards} #{card.face}" }
     all_cards
   end
 end

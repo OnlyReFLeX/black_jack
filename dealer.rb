@@ -1,4 +1,8 @@
 class Dealer < Player
+  def initialize(name = 'Dealer')
+    super(name)
+  end
+
   def take_card(cards)
     super(cards)
     puts "#{name} взял карту ?"
@@ -14,9 +18,7 @@ class Dealer < Player
 
   def hide_cards
     hide_cards = ''
-    @cards.each do
-      hide_cards = "#{hide_cards} ?"
-    end
+    @cards.each { hide_cards = "#{hide_cards} ?" }
     hide_cards
   end
 end

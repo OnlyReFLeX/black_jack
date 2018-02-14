@@ -1,6 +1,6 @@
 class Controller
   def initialize
-    @dealer = Dealer.new('Dealer')
+    @dealer = Dealer.new
     @bank = Bank.new
   end
 
@@ -18,10 +18,25 @@ class Controller
   end
 
   def new_game
-    @deck = Card.new_deck
+    game_over if money_empty?
+    new_deck
+    player_clear_cards
+    round
+  end
+
+  def money_empty?
+    @user.bank <= 0 || @dealer.bank <= 0
+  end
+
+  def game_over
+    puts "На счету у вас #{@user.bank}$, а у диллера #{@dealer.bank}$
+          вы не можете играть дальше"
+    exit
+  end
+
+  def player_clear_cards
     @user.cards = []
     @dealer.cards = []
-    round
   end
 
   def show_info
@@ -42,7 +57,7 @@ class Controller
     end
     show_info
     step
-    end_game
+    open_cards
   end
 
   def step
@@ -50,20 +65,9 @@ class Controller
     choice = gets.chomp
     case choice
     when 'card'
-      if @user.cards.size > 2
-        puts 'Вы не можете больше взять карту'
-        step
-      else
-        @user.take_card(@deck)
-        if @user.score > 21
-          end_game
-        else
-          @dealer.step(@deck)
-          step
-        end
-      end
+      choice_card
     when 'open'
-      end_game
+      open_cards
     when 'skip'
       puts 'Вы пропустили ход'
       @dealer.step(@deck)
@@ -73,7 +77,23 @@ class Controller
     end
   end
 
-  def end_game
+  def choice_card
+    if @user.cards.size > 2
+      puts 'Вы не можете больше взять карту'
+      step
+    else
+      @user.take_card(@deck)
+      show_info
+      if @user.score > 21
+        open_cards
+      else
+        @dealer.step(@deck)
+        step
+      end
+    end
+  end
+
+  def open_cards
     money_to_winner
     puts '....----==Результат==----....'
     puts "Победитель: #{winner_name}"
@@ -115,5 +135,9 @@ class Controller
     elsif @dealer.score != @user.score
       [@user, @dealer].max_by(&:score)
     end
+  end
+
+  def new_deck
+    @deck = Deck.new
   end
 end
