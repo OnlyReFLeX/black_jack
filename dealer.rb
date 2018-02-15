@@ -10,7 +10,7 @@ class Dealer < Player
 
   def step(step)
     if score > 17 || @cards.size == 3
-      puts 'Пропустил ход'
+      puts "#{self.name} Пропустил ход"
     else
       take_card(step)
     end

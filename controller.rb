@@ -1,4 +1,6 @@
 class Controller
+  include Interface
+
   def initialize
     @dealer = Dealer.new
     @bank = Bank.new
@@ -12,9 +14,7 @@ class Controller
   private
 
   def introduce
-    print 'Как вас называть: '
-    name = gets.chomp
-    @user = User.new(name)
+    @user = User.new(ask_name)
   end
 
   def new_game
@@ -28,24 +28,9 @@ class Controller
     @user.bank <= 0 || @dealer.bank <= 0
   end
 
-  def game_over
-    puts "На счету у вас #{@user.bank}$, а у диллера #{@dealer.bank}$
-          вы не можете играть дальше"
-    exit
-  end
-
   def player_clear_cards
     @user.cards = []
     @dealer.cards = []
-  end
-
-  def show_info
-    puts '....----==Информация==----....'
-    puts "#{@user.score} ваши очки"
-    puts "Ставка #{@bank.money}$"
-    puts "#{@user.name} #{@user.bank}$ | #{@dealer.name} #{@dealer.bank}$"
-    puts "Твои карты #{@user.all_cards}"
-    puts "Карты у диллера #{@dealer.hide_cards}"
   end
 
   def round
@@ -61,15 +46,13 @@ class Controller
   end
 
   def step
-    print 'Взять карту "card" / открыть карты "open"/ пропустить "skip"'
-    choice = gets.chomp
-    case choice
+    case select_choice
     when 'card'
       choice_card
     when 'open'
       open_cards
     when 'skip'
-      puts 'Вы пропустили ход'
+      skip_step(@user)
       @dealer.step(@deck)
       step
     else
@@ -78,13 +61,12 @@ class Controller
   end
 
   def choice_card
-    if @user.cards.size > 2
-      puts 'Вы не можете больше взять карту'
-      step
+    if card_limit?(@user)
+      card_limit
     else
       @user.take_card(@deck)
       show_info
-      if @user.score > 21
+      if score_limit?(@user)
         open_cards
       else
         @dealer.step(@deck)
@@ -93,23 +75,18 @@ class Controller
     end
   end
 
-  def open_cards
-    money_to_winner
-    puts '....----==Результат==----....'
-    puts "Победитель: #{winner_name}"
-    puts "Карты диллера #{@dealer.all_cards} | очки #{@dealer.score}"
-    puts "Твои карты #{@user.all_cards} | очки #{@user.score}"
-    one_more_game
+  def card_limit?(player)
+    player.cards.size > 2
   end
 
-  def one_more_game
-    puts 'Хотите еще раз сыграть ?  ( y / n )'
-    case gets.chomp
-    when 'y'
-      new_game
-    when 'n'
-      exit
-    end
+  def score_limit?(player)
+    player.score > 21
+  end
+
+  def open_cards
+    money_to_winner
+    end_result_info
+    one_more_game
   end
 
   def money_to_winner
@@ -123,14 +100,10 @@ class Controller
     @bank.credit(@bank.money)
   end
 
-  def winner_name
-    winner ? winner.name : 'ничья'
-  end
-
   def winner
-    if @user.score > 21
+    if score_limit?(@user)
       @dealer
-    elsif @dealer.score > 21
+    elsif score_limit?(@dealer)
       @user
     elsif @dealer.score != @user.score
       [@user, @dealer].max_by(&:score)

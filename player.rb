@@ -26,7 +26,7 @@ class Player
     @score = 0
     @cards.each do |card|
       @score += if @score + card.value.max > 21
-                  ard.value.min
+                  card.value.min
                 else
                   card.value.max
                 end
