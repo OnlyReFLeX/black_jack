@@ -7,5 +7,5 @@ require_relative 'card'
 require_relative 'controller'
 require_relative 'bank'
 
-controller = Controller.new
-controller.start
+interface = Interface.new
+interface.start
